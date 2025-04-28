@@ -24,7 +24,7 @@ const listingsRouter = require("./routes/listing.js");
 const reviewsRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
-const dbUrl = process.env.ATLASTDB_URL;
+const dbUrl =process.env.ATLASTDB_URL;
 
 main().then(()=>{
     console.log("connected to DB");
