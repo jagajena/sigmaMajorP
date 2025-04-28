@@ -44,22 +44,37 @@ app.engine('ejs',ejsMate);
 app.use(express.static(path.join(__dirname,"/public")));
 
 
-const sessionConfig = {
-    secret: process.env.SESSION_SECRET || 'defaultsecret',
-    resave: false,
-    saveUninitialized: true,
-    store: MongoStore.create({
-        mongoUrl: process.env.MONGO_URI || 'mongodb://localhost:27017/majorproject', // Update with your MongoDB URI
-        touchAfter: 24 * 3600 // time period in seconds
-    }),
-    cookie: {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 1000 * 60 * 60 * 24 // 1 day
-    }
-};
+const store = MongoStore.create({
+    mongoUrl : dbUrl,
+    crypto: {
+        secret:process.env.SECRET,
+    },
+    touchAfter: 24 * 3600,
+});
 
-app.use(session(sessionConfig));
+store.on("error", (err) =>{
+    console.log("ERROR IN MONGO SESION STORE",err);
+})
+
+const sessionOptions  ={
+    store, 
+    secret :process.env.SECRET,
+    resave :false,
+    saveUninitialized :true,
+    cookie:{
+        expires : Date.now() + 7 * 24 * 60 * 60 * 1000,
+        maxAge  : 7 * 24 * 60 * 60 * 1000,
+        httpOnly : true,
+    }
+}
+
+
+
+// app.get("/",(req,res)=>{
+//     res.send("Hi, I am root");
+// });
+
+app.use(session(sessionOptions));
 app.use(flash());
 
 app.use(passport.initialize());
